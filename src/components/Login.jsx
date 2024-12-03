@@ -1,13 +1,42 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../providers/AuthProvider';
+import { auth } from '../firebase.init';
 
 const Login = () => {
+    const navigate = useNavigate();//jokhon user email pass diye login korbe tokhon jeno homePage e niye jay.
+    const {loginUser, signInWithGoogle} = useContext(AuthContext);
+
+
+
     const handleLogin = (e) => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
 
         console.log(email, password)
+
+        // Login user
+        loginUser(email, password)
+        .then((result) => {
+            console.log(result.user)
+            e.target.reset(); //email pass deyar por field jeno clean hoye jay.
+            navigate('/');
+        })
+        .catch((error) => {
+            console.log('ERROR', error.message);
+        })
+    }
+
+    const handleGoogleSignIn =() => {
+        signInWithGoogle()
+        .then((result) => {
+            console.log(result.user)
+            navigate('/profile')
+        })
+        .catch((error) => {
+            console.log(error.message);
+        })
     }
     return (
         <div className="hero bg-base-200 min-h-screen">
@@ -41,6 +70,9 @@ const Login = () => {
                         </div>
                     </form>
                     <p className='m-4'>New to this website? please <Link to='/register'>Register</Link></p>
+                    <div className='text-center m-4'>
+                        <button onClick={handleGoogleSignIn} className='btn btn-wide btn-error '>Sign in with Google</button>
+                    </div>
                 </div>
             </div>
         </div>
